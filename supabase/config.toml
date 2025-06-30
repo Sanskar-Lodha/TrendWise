@@ -1,1 +1,8 @@
+
 project_id = "bjbwacfqjwzzmolgsbrx"
+
+[functions.generate-article]
+verify_jwt = false
+
+[functions.fetch-trending-topics]
+verify_jwt = false

@@ -1,71 +1,68 @@
 
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { Search, TrendingUp, Calendar, User, ArrowRight, Sparkles } from 'lucide-react';
+import { useState } from 'react';
+import { Search, TrendingUp, ArrowRight, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import ArticleCard from '@/components/ArticleCard';
 import Hero from '@/components/Hero';
+import { useArticles } from '@/hooks/useArticles';
 
 const Index = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [articles] = useState([
-    {
-      id: 1,
-      title: "The Future of AI in Content Creation: Trends Shaping 2024",
-      slug: "future-ai-content-creation-2024",
-      excerpt: "Discover how artificial intelligence is revolutionizing content creation and what it means for creators and businesses.",
-      author: "TrendWise AI",
-      publishDate: "2024-01-15",
-      readTime: "5 min read",
-      tags: ["AI", "Technology", "Content"],
-      image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=800&q=80",
-      trending: true
-    },
-    {
-      id: 2,
-      title: "Social Media Trends That Will Dominate This Year",
-      slug: "social-media-trends-2024",
-      excerpt: "From short-form videos to AI-powered personalization, explore the social media trends reshaping digital marketing.",
-      author: "TrendWise AI",
-      publishDate: "2024-01-14",
-      readTime: "7 min read",
-      tags: ["Social Media", "Marketing", "Trends"],
-      image: "https://images.unsplash.com/photo-1611926653458-09294b3142bf?auto=format&fit=crop&w=800&q=80",
-      trending: false
-    },
-    {
-      id: 3,
-      title: "Sustainable Technology: Green Innovations Taking Center Stage",
-      slug: "sustainable-technology-green-innovations",
-      excerpt: "How eco-friendly tech solutions are becoming mainstream and driving the next wave of innovation.",
-      author: "TrendWise AI",
-      publishDate: "2024-01-13",
-      readTime: "6 min read",
-      tags: ["Sustainability", "Technology", "Environment"],
-      image: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80",
-      trending: true
-    },
-    {
-      id: 4,
-      title: "Remote Work Evolution: The New Digital Workplace",
-      slug: "remote-work-evolution-digital-workplace",
-      excerpt: "Analyzing how remote work continues to evolve and shape the future of business operations.",
-      author: "TrendWise AI",
-      publishDate: "2024-01-12",
-      readTime: "8 min read",
-      tags: ["Remote Work", "Business", "Technology"],
-      image: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?auto=format&fit=crop&w=800&q=80",
-      trending: false
-    }
-  ]);
+  const { articles, loading, error } = useArticles();
 
   const filteredArticles = articles.filter(article =>
     article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     article.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
   );
+
+  const trendingArticles = filteredArticles.filter(article => article.trending);
+
+  // Convert database article format to component format
+  const formatArticleForCard = (article: any) => ({
+    id: parseInt(article.id),
+    title: article.title,
+    slug: article.slug,
+    excerpt: article.excerpt || '',
+    author: article.author,
+    publishDate: article.publish_date,
+    readTime: article.read_time || '5 min read',
+    tags: article.tags || [],
+    image: article.image_url || 'https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=800&q=80',
+    trending: article.trending || false
+  });
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+        <Navigation />
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading articles...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+        <Navigation />
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="text-center">
+            <p className="text-red-600 mb-4">Error loading articles: {error}</p>
+            <Button onClick={() => window.location.reload()}>
+              Try Again
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
@@ -90,23 +87,27 @@ const Index = () => {
       </section>
 
       {/* Trending Section */}
-      <section className="py-12 px-4 max-w-7xl mx-auto">
-        <div className="flex items-center gap-3 mb-8">
-          <div className="flex items-center gap-2">
-            <TrendingUp className="h-6 w-6 text-red-500" />
-            <h2 className="text-3xl font-bold text-gray-900">Trending Now</h2>
+      {trendingArticles.length > 0 && (
+        <section className="py-12 px-4 max-w-7xl mx-auto">
+          <div className="flex items-center gap-3 mb-8">
+            <div className="flex items-center gap-2">
+              <TrendingUp className="h-6 w-6 text-red-500" />
+              <h2 className="text-3xl font-bold text-gray-900">Trending Now</h2>
+            </div>
+            <Sparkles className="h-5 w-5 text-yellow-500 animate-pulse" />
           </div>
-          <Sparkles className="h-5 w-5 text-yellow-500 animate-pulse" />
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredArticles
-            .filter(article => article.trending)
-            .map(article => (
-              <ArticleCard key={article.id} article={article} featured />
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {trendingArticles.map(article => (
+              <ArticleCard 
+                key={article.id} 
+                article={formatArticleForCard(article)} 
+                featured 
+              />
             ))}
-        </div>
-      </section>
+          </div>
+        </section>
+      )}
 
       {/* Latest Articles */}
       <section className="py-12 px-4 max-w-7xl mx-auto">
@@ -117,11 +118,20 @@ const Index = () => {
           </Button>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredArticles.map(article => (
-            <ArticleCard key={article.id} article={article} />
-          ))}
-        </div>
+        {filteredArticles.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-gray-500 text-lg">No articles found matching your search.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {filteredArticles.map(article => (
+              <ArticleCard 
+                key={article.id} 
+                article={formatArticleForCard(article)} 
+              />
+            ))}
+          </div>
+        )}
       </section>
 
       {/* Newsletter Section */}

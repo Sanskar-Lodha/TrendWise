@@ -9,7 +9,149 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      articles: {
+        Row: {
+          author: string
+          content: string | null
+          created_at: string
+          excerpt: string | null
+          id: string
+          image_url: string | null
+          meta_description: string | null
+          publish_date: string
+          read_time: string | null
+          slug: string
+          tags: string[] | null
+          title: string
+          trending: boolean | null
+          updated_at: string
+        }
+        Insert: {
+          author: string
+          content?: string | null
+          created_at?: string
+          excerpt?: string | null
+          id?: string
+          image_url?: string | null
+          meta_description?: string | null
+          publish_date?: string
+          read_time?: string | null
+          slug: string
+          tags?: string[] | null
+          title: string
+          trending?: boolean | null
+          updated_at?: string
+        }
+        Update: {
+          author?: string
+          content?: string | null
+          created_at?: string
+          excerpt?: string | null
+          id?: string
+          image_url?: string | null
+          meta_description?: string | null
+          publish_date?: string
+          read_time?: string | null
+          slug?: string
+          tags?: string[] | null
+          title?: string
+          trending?: boolean | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      comments: {
+        Row: {
+          article_id: string
+          author_name: string
+          content: string
+          created_at: string
+          id: string
+          likes: number | null
+          user_id: string
+        }
+        Insert: {
+          article_id: string
+          author_name: string
+          content: string
+          created_at?: string
+          id?: string
+          likes?: number | null
+          user_id: string
+        }
+        Update: {
+          article_id?: string
+          author_name?: string
+          content?: string
+          created_at?: string
+          id?: string
+          likes?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comments_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "articles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          email: string | null
+          full_name: string | null
+          id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+        }
+        Relationships: []
+      }
+      trending_topics: {
+        Row: {
+          fetched_at: string
+          id: string
+          region: string | null
+          search_volume: number | null
+          source: string
+          topic: string
+          used_for_article: boolean | null
+        }
+        Insert: {
+          fetched_at?: string
+          id?: string
+          region?: string | null
+          search_volume?: number | null
+          source: string
+          topic: string
+          used_for_article?: boolean | null
+        }
+        Update: {
+          fetched_at?: string
+          id?: string
+          region?: string | null
+          search_volume?: number | null
+          source?: string
+          topic?: string
+          used_for_article?: boolean | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
